@@ -29,7 +29,7 @@
 my_x = x;
 my_y = y;
 dir = -1;
-timer = 1;
+timer = 0;
 hp = 5;
 current_act_state = act_state.active;
 </string>
