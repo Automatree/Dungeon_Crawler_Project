@@ -27,6 +27,7 @@
     <object>objects\obj_baddie2</object>
     <object>objects\obj_wall</object>
     <object>objects\obj_hitbox</object>
+    <object>objects\obj_commit_test</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\start_code</room>
