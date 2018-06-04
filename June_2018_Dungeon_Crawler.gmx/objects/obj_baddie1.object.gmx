@@ -39,9 +39,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>icon_sprite = spr_baddie1;
+            <string>//just things that are different from generic enemy parent.
+icon_sprite = spr_baddie1;
 hp = 1;
-timer = 0;
 </string>
           </argument>
         </arguments>
@@ -66,12 +66,15 @@ timer = 0;
             <kind>1</kind>
             <string>//act_state.active
 
+//If dead, skip this creature's turn
 if hp &lt;= 0
     {
     current_act_state = act_state.inactive;
     exit;
     }
 
+//If right next to the player, attack
+//CHANGES NEEDED: This is a hacky method of doing attack detection
 if point_distance(x,y,obj_hero.x,obj_hero.y) &lt;= 32
     {
     current_act_state = act_state.attack_resolve;
@@ -79,6 +82,8 @@ if point_distance(x,y,obj_hero.x,obj_hero.y) &lt;= 32
     exit;
     }
 
+//Determine if the difference in x or y coordinate of this creature and the player is larger.  If blocked from "optimal path", use default parent's wandering AI.
+//CHANGES NEEDED: Doesn't properly detect if both x/y are blocked before resorting to randomness.
 if abs(x-obj_hero.x) &gt; abs(y-obj_hero.y)
     {
     if place_empty(x+32*sign(obj_hero.x-x),y)

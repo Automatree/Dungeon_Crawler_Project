@@ -25,12 +25,20 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>obj_turn_organizer.creature_id[obj_turn_organizer.creature_count] = id;
+            <string>///initialize the enemy parent
+
+//tell the turn organizer that a new creature has arrived.
+obj_turn_organizer.creature_id[obj_turn_organizer.creature_count] = id;
 obj_turn_organizer.creature_count += 1;
+//Enemies start off inactive.
 current_act_state = act_state.inactive;
+//default hp is 3.
 hp = 3;
+//my_x and my_y are fake coordinates for drawing the sprites.
 my_x = x;
 my_y = y;
+//timer usually indicates when this creature's turn is over.
+timer = 0;
 </string>
           </argument>
         </arguments>
@@ -53,16 +61,21 @@ my_y = y;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>event_user(current_act_state);
+            <string>///call user event and check if dead
+event_user(current_act_state);
+
+//Move sprite towards real coords
 my_x = lerp(my_x,x,.50);
 my_y = lerp(my_y,y,.50);
 
+//if dead, set sprites to indicate death.
 if hp &lt;= 0
     {
     sprite_index = spr_dead;
     icon_sprite = spr_dead;
     }
-    
+
+//CHANGE NEEDED: some of this code is repetitive and needs to be put in scripts.
 depth = -my_y;
 </string>
           </argument>
@@ -87,13 +100,18 @@ depth = -my_y;
           <argument>
             <kind>1</kind>
             <string>///act_state.attack_resolve
+
+//The first frame of the attack, place the hitbox on the nearby hero
+//CHANGE NEEDED: this can probably result in some unfair situations where enemies hit player without actually being able to.
 if timer = 15
     {
     instance_create(obj_hero.x,obj_hero.y,obj_hitbox);
     }
 
+//increment timer by 1
 timer -= 1;
-    
+
+//when the timer expires, end this creature's turn.    
 if timer &lt;= 0
     {
     current_act_state = act_state.inactive;
@@ -122,6 +140,7 @@ if timer &lt;= 0
             <kind>1</kind>
             <string>///act_state.move_resolve
 
+//If the sprite is close to actual coords, end turn
 if (abs(my_x - x) &lt; 1) &amp;&amp; (abs(my_y - y) &lt; 1)
     {
     current_act_state = act_state.inactive;
@@ -148,27 +167,34 @@ if (abs(my_x - x) &lt; 1) &amp;&amp; (abs(my_y - y) &lt; 1)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if hp &lt;= 0
+            <string>///act_state.active
+
+//If dead, this creature skips its turn
+if hp &lt;= 0
     {
     current_act_state = act_state.inactive;
     exit;
     }
     
-
+//default AI: choose a random direction
+//CHANGE NEEDED: AI needs major overhaul.  major bug: can freeze game if there are no open spots.
 dir = choose(0,1,2,3)
 
+//If the spot in the given direction is empty, resolve to move there.
 if place_empty(x+lengthdir_x(32,dir*90),y+lengthdir_y(32,dir*90))
     {
     x = x + lengthdir_x(32,dir*90);
     y = y + lengthdir_y(32,dir*90);
     current_act_state = act_state.move_resolve;
     }
+//else if the hero is there, attack them
 else if place_meeting(x+lengthdir_x(32,dir*90),y+lengthdir_y(32,dir*90),obj_hero)
     {
     current_act_state = act_state.attack_resolve;
     timer = 30;
     }
-
+//CHANGE NEEDED:
+//there's no handling for if there's something in the way, the game just wastes a frame and tries again next frame.
 </string>
           </argument>
         </arguments>
@@ -191,13 +217,17 @@ else if place_meeting(x+lengthdir_x(32,dir*90),y+lengthdir_y(32,dir*90),obj_hero
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if current_act_state != act_state.inactive &amp;&amp; global.debug = 1
+            <string>//if in global.debug mode and this creature is active, draw the turn indicator behind it.
+if current_act_state != act_state.inactive &amp;&amp; global.debug = 1
     {
     draw_sprite(spr_turn_indicator,0,my_x-16,my_y-32);
     }
 
+//draw its shadow, then its sprite.
 draw_sprite(spr_shadow,0,my_x,my_y);
 draw_sprite(sprite_index,image_index,my_x,my_y);
+
+//disabled debug text display
 //draw_text(my_x,my_y - 48, string(current_act_state))
 </string>
           </argument>

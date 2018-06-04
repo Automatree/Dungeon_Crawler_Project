@@ -25,7 +25,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>enum turn_state {
+            <string>///set up the turn organizer object
+
+enum turn_state {
     determine_next,
     wait_for_resolution
 }
@@ -35,14 +37,26 @@
     wait_for_resolution: Waits for the creature to set its flag to "inactive"
 */
 
+//creature_count is the total number of creatures in the game.
+//the creature_id array holds the id of each creature.  It ends at creature_count - 1
+//The default creature_id[0] is the hero, because he always moves first.
 creature_count = 1;
 creature_id[0] = obj_hero.id;
 
+//current_turn_state indicates the current turn state
 current_turn_state = turn_state.wait_for_resolution;
+//The current creature's turn defaults to 0, which is the player's character
 current_creature_turn = 0;
-turn_timer = 0;
+
+//call randomize to change the seed randomly, thus making the rest of the game random.
 randomize();
+//set global.debug to 0, when it is set to 1, various debug things are drawn.
 global.debug = 0;
+
+
+
+//turn timer was a variable for tracking time between each creature's move, I've determined that it was too slow and removed it.
+//turn_timer = 0;
 </string>
           </argument>
         </arguments>
@@ -65,7 +79,8 @@ global.debug = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>event_user(current_turn_state);
+            <string>///Call the user event for the current turn state
+event_user(current_turn_state);
 </string>
           </argument>
         </arguments>
@@ -89,10 +104,11 @@ global.debug = 0;
           <argument>
             <kind>1</kind>
             <string>///turn_state.wait_for_resolution
+
+//If the current creature's act state is inactive, set the current turn state to determine next
 if creature_id[current_creature_turn].current_act_state == act_state.inactive
     {
     current_turn_state = turn_state.determine_next;
-    turn_timer = 0;
     }
 </string>
           </argument>
@@ -117,21 +133,17 @@ if creature_id[current_creature_turn].current_act_state == act_state.inactive
           <argument>
             <kind>1</kind>
             <string>///turn_state.determine_next
-if turn_timer &lt;= 0
-    {
-    current_creature_turn += 1;
-    if (current_creature_turn &gt;= creature_count)
-        {
-        current_creature_turn = 0;
-        }
 
-    creature_id[current_creature_turn].current_act_state = act_state.active;
-    current_turn_state = turn_state.wait_for_resolution;
-    }
-else
+//Move to the next creature's turn.  If we were at the last creature, loop around to the first.
+current_creature_turn += 1;
+if (current_creature_turn &gt;= creature_count)
     {
-    turn_timer -= 1;
+    current_creature_turn = 0;
     }
+    
+//Set the current creature's act state to active, and set current turn state to waiting
+creature_id[current_creature_turn].current_act_state = act_state.active;
+current_turn_state = turn_state.wait_for_resolution;
 </string>
           </argument>
         </arguments>
@@ -154,14 +166,16 @@ else
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if global.debug = 0
+            <string>///Draw debug stuff only if global.debug is true
+
+if global.debug = 0
     {
     exit;
     }
 
+//For each creature, draw its icon sprite, and if it's the current creature, draw the turn indicator behind it.
 for (i = 0; i &lt; creature_count; i++)
     {
-    //draw_text(0,i*16,string(creature_id[i]));
     if i = current_creature_turn
         {
         draw_sprite(spr_turn_indicator,0,i*32,0);
@@ -190,6 +204,26 @@ for (i = 0; i &lt; creature_count; i++)
       </action>
     </event>
     <event eventtype="9" enumb="73">
+      <action>
+        <libid>1</libid>
+        <id>605</id>
+        <kind>0</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>0</useapplyto>
+        <exetype>0</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>this just toggles global.debug</string>
+          </argument>
+        </arguments>
+      </action>
       <action>
         <libid>1</libid>
         <id>611</id>

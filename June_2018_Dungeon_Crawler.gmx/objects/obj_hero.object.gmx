@@ -25,12 +25,20 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>icon_sprite = spr_hero;
+            <string>///initialize the hero object
+
+//icon sprite for the debug turn indicator
+icon_sprite = spr_hero;
+//my_x and my_y for the sprite location
 my_x = x;
 my_y = y;
+//dir stands for direction and can be 0,1,2,3 and is multiplied by 90 to get actual angles.
 dir = -1;
+//timer is a number that counts down, generally to indicate that the player should become inactive.
 timer = 0;
+//hp stands for hit points.
 hp = 5;
+//the act state for the player starts off as active as the player always has the first turn.
 current_act_state = act_state.active;
 </string>
           </argument>
@@ -54,16 +62,22 @@ current_act_state = act_state.active;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>event_user(current_act_state);
+            <string>///call the user event and check if dead
+event_user(current_act_state);
+
+//moves the sprite closer to the creature's "real" position.
 my_x = lerp(my_x,x,.50);
 my_y = lerp(my_y,y,.50);
 
+//if the player is dead, change their sprite and icon
 if hp &lt;= 0
     {
     sprite_index = spr_dead;
     icon_sprite = spr_dead;
     }
 
+//When two sprites are drawn in the same spot, the one with a lower depth is drawn over the other.
+//y increases as you move down the screen, so -y makes objects that are "closer" drawn over objects that are "farther"
 depth = -my_y;
 </string>
           </argument>
@@ -88,13 +102,18 @@ depth = -my_y;
           <argument>
             <kind>1</kind>
             <string>///act_state.attack_resolve
+
+//At the start of this state, create an attack in the intended direction.
+//CHANGE NEEDED: this is a really shoddy attack method, just poor work overall.
 if timer = 15
     {
     instance_create(x+lengthdir_x(32,dir*90),y+lengthdir_y(32,dir*90),obj_hitbox);
     }
 
+//increment the timer.
 timer -= 1;
-    
+
+//when the timer expires, this creature becomes inactive.
 if timer &lt;= 0
     {
     current_act_state = act_state.inactive;
@@ -124,6 +143,7 @@ if timer &lt;= 0
             <kind>1</kind>
             <string>///act_state.move_resolve
 
+//If the sprite is basically in the same spot as this creature's actual position, it becomes inactive.
 if (abs(my_x - x) &lt; 1) &amp;&amp; (abs(my_y - y) &lt; 1)
     {
     current_act_state = act_state.inactive;
@@ -151,11 +171,17 @@ if (abs(my_x - x) &lt; 1) &amp;&amp; (abs(my_y - y) &lt; 1)
           <argument>
             <kind>1</kind>
             <string>///act_state.active
+
+//if this character is dead, skip their turn.
+//CHANGE NEEDED: removing creatures from the turn array so this isn't necessary.
 if hp &lt;= 0
     {
     current_act_state = act_state.inactive;
     }
 
+//set the player's direction if they press a key
+//dir is normally set to -1 when they move so that they're not stuck moving in one direction
+//CHANGE NEEDED: remove code from player object and reference an input object so we can have multiple input options.
 if keyboard_check(ord('W'))
     {
     dir = 1;
@@ -172,25 +198,29 @@ if keyboard_check(ord('D'))
     {
     dir = 0;
     }
+//If the player presses space, skip their turn.
 if keyboard_check(vk_space)
     {
     current_act_state = act_state.inactive;
     }
-    
+
+//If the player clicks left, create a hitbox on the indicated square, instantly hurting any enemy there once.
+//CHANGE NEEDED: sub for some kind of way to swap/access spells, so that spells aren't hard-wired to certain controls.
 if mouse_check_button_pressed(mb_left)
     {
     instance_create(floor(mouse_x/32)*32+16,floor(mouse_y/32)*32+16,obj_hitbox)
     current_act_state = act_state.inactive;
     }
-if mouse_check_button_pressed(mb_right)
+//If the player clicks right in an empty spot, create a generic test enemy there.
+if mouse_check_button_pressed(mb_right) &amp;&amp; place_free(floor(mouse_x/32)*32+16,floor(mouse_y/32)*32+16)
     {
-    if place_free(floor(mouse_x/32)*32+16,floor(mouse_y/32)*32+16)
-        {
-        instance_create(floor(mouse_x/32)*32+16,floor(mouse_y/32)*32+16,obj_baddie1);
-        }
+    instance_create(floor(mouse_x/32)*32+16,floor(mouse_y/32)*32+16,obj_baddie1);
     current_act_state = act_state.inactive;
     }
+
     
+//If the player pressed a direction button, check if the space in that direction is empty or occupied by an enemy.
+//If empty, move there and resolve the move.  If enemy, resolve with an attack.
 if dir &gt;= 0
     {
     if place_empty(x+lengthdir_x(32,dir*90),y+lengthdir_y(32,dir*90))
@@ -228,7 +258,8 @@ if dir &gt;= 0
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>draw_sprite(spr_shadow,0,my_x,my_y);
+            <string>//draw the shadow first, then the sprite.
+draw_sprite(spr_shadow,0,my_x,my_y);
 draw_sprite(sprite_index,image_index,my_x,my_y);
 </string>
           </argument>

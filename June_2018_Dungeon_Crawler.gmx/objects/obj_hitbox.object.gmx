@@ -25,7 +25,11 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>used = 0;
+            <string>///initialize hitbox item.
+
+//used is 0 unless it hits something.  This prevents hitbox from hitting the same creature multiple times.
+used = 0;
+//life is the hitbox's time remaining.  When it hits 0, the hitbox deletes itself.
 life = 1;
 </string>
           </argument>
@@ -49,8 +53,11 @@ life = 1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>life -= 0.05;
+            <string>//increment life counter towards 0
+life -= 0.05;
+//set opacity to current life
 image_alpha = life;
+//if dead, delete self
 if life &lt;= 0
     {
     instance_destroy(self);
@@ -77,7 +84,10 @@ if life &lt;= 0
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if used = 0
+            <string>//if this hitbox hasn't already hit something, use hitbox and hurt creature.
+//CHANGES NEEDED: Import hitbox system from older project.
+
+if used = 0
     {
     other.hp -= 1;
     used = 1;
@@ -104,7 +114,9 @@ if life &lt;= 0
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if used = 0
+            <string>//if this hitbox hasn't already hit something, use hitbox and hurt creature.
+//CHANGES NEEDED: Import hitbox system from older project.
+if used = 0
     {
     other.hp -= 1;
     used = 1;
