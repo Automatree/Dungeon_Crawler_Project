@@ -39,7 +39,8 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>icon_sprite = spr_baddie2;
+            <string>//changes this guy's sprite from default enemy parent's.
+icon_sprite = spr_baddie2;
 </string>
           </argument>
         </arguments>
@@ -62,7 +63,12 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if hp &lt;= 0
+            <string>///act_state.active
+
+//I think this is just a copy of the parent's code
+//CHANGES NEEDED: double check if this is just a copy of parent's code.
+
+if hp &lt;= 0
     {
     current_act_state = act_state.inactive;
     exit;
